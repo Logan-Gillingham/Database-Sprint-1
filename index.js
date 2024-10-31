@@ -13,46 +13,50 @@ const pool = new Pool({
  * Creates the database tables, if they do not already exist.
  */
 async function createTable() {
-  // TODO: Add code to create Movies, Customers, and Rentals tables
-};
+  await pool.query(`
+      CREATE TABLE IF NOT EXISTS movies (
+          movie_id SERIAL PRIMARY KEY,
+          title VARCHAR(100) NOT NULL,
+          year INTEGER,
+          genre VARCHAR(50),
+          director VARCHAR(100)
+      );
 
-/**
- * Inserts a new movie into the Movies table.
- * 
- * @param {string} title Title of the movie
- * @param {number} year Year the movie was released
- * @param {string} genre Genre of the movie
- * @param {string} director Director of the movie
- */
+      CREATE TABLE IF NOT EXISTS customers (
+          customer_id SERIAL PRIMARY KEY,
+          first_name VARCHAR(50) NOT NULL,
+          last_name VARCHAR(50) NOT NULL,
+          email VARCHAR(100) UNIQUE NOT NULL,
+          phone_number VARCHAR(20)
+      );
+
+      CREATE TABLE IF NOT EXISTS rentals (
+          rental_id SERIAL PRIMARY KEY,
+          customer_id INTEGER REFERENCES customers(customer_id),
+          movie_id INTEGER REFERENCES movies(movie_id),
+          rental_date DATE,
+          due_date DATE
+      );
+  `);
+}
+
 async function insertMovie(title, year, genre, director) {
-  // TODO: Add code to insert a new movie into the Movies table
-};
+  await pool.query('INSERT INTO movies (title, year, genre, director) VALUES ($1, $2, $3, $4)', [title, year, genre, director]);
+}
 
-/**
- * Prints all movies in the database to the console
- */
 async function displayMovies() {
-  // TODO: Add code to retrieve and print all movies from the Movies table
-};
+  const result = await pool.query('SELECT * FROM movies');
+  console.table(result.rows);
+}
 
-/**
- * Updates a customer's email address.
- * 
- * @param {number} customerId ID of the customer
- * @param {string} newEmail New email address of the customer
- */
 async function updateCustomerEmail(customerId, newEmail) {
-  // TODO: Add code to update a customer's email address
-};
+  await pool.query('UPDATE customers SET email = $1 WHERE customer_id = $2', [newEmail, customerId]);
+}
 
-/**
- * Removes a customer from the database along with their rental history.
- * 
- * @param {number} customerId ID of the customer to remove
- */
 async function removeCustomer(customerId) {
-  // TODO: Add code to remove a customer and their rental history
-};
+  await pool.query('DELETE FROM rentals WHERE customer_id = $1', [customerId]);
+  await pool.query('DELETE FROM customers WHERE customer_id = $1', [customerId]);
+}
 
 /**
  * Prints a help message to the console
