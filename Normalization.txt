@@ -1,0 +1,18 @@
+Each table is in 3NF:
+
+movies:
+
+Each row represents a unique movie.
+No transitive dependencies exist.
+
+customers:
+
+Each row represents a unique customer.
+No transitive dependencies exist.
+
+rentals:
+
+Each row represents a unique rental.
+The primary key (rental_id) uniquely identifies each rental.
+Foreign keys (customer_id and movie_id) reference primary keys in other tables, ensuring data integrity.
+No transitive dependencies exist.
